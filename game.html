@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fall dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #fffacd;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #fffacd;
+            border: 2px solid #000;
+        }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="800" height="500"></canvas>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let player = { x: 370, y: 450, width: 60, height: 20, color: "blue", speed: 4 };
+    let obstacles = [];
+    let score = 0;
+    let gameOver = false;
+
+    function createObstacle() {
+        let size = Math.random() * 30 + 20;
+        let x = Math.random() * (canvas.width - size);
+        let speed = Math.random() * 1 + 1; // reduced speed
+        obstacles.push({ x, y: 0, width: size, height: size, color: "red", speed });
+    }
+
+    function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawObstacles() {
+        obstacles.forEach(obs => {
+            ctx.fillStyle = obs.color;
+            ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+        });
+    }
+
+    function moveObstacles() {
+        obstacles.forEach(obs => {
+            obs.y += obs.speed; 
+        });
+
+        obstacles = obstacles.filter(obs => obs.y < canvas.height);
+    }
+
+    function detectCollision() {
+        obstacles.forEach(obs => {
+            if (obs.y + obs.height >= player.y &&
+                obs.x < player.x + player.width &&
+                obs.x + obs.width > player.x) {
+                gameOver = true;
+            }
+        });
+    }
+
+    function drawScore() {
+        ctx.fillStyle = "black";
+        ctx.font = "20px Arial";
+        ctx.fillText("Score: " + score, 10, 20);
+    }
+
+    function update() {
+        if (gameOver) {
+            ctx.fillStyle = "#ffffe0"; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "black";
+            ctx.font = "30px Arial";
+            ctx.fillText("Game Over! Score: " + score, 250, 250);
+            return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawPlayer();
+        drawObstacles();
+        moveObstacles();
+        detectCollision();
+        drawScore();
+
+        requestAnimationFrame(update);
+    }
+
+    setInterval(createObstacle, 400); 
+    setInterval(() => { score++; }, 1000);
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft" && player.x > 0) {
+            player.x -= player.speed;
+        } else if (e.key === "ArrowRight" && player.x + player.width < canvas.width) {
+            player.x += player.speed;
+        }
+    });
+
+    update();
+</script>
+</body>
+</html>
