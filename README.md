@@ -15,5 +15,7 @@ A simple browser-based game where you move the player left and right to avoid fa
 - Falling obstacles with random sizes and speeds
 - Score tracking system
 
+click on the link to play the game :)
 
+https://apoorva0021.github.io/Falling-block-game/
 
